@@ -17,11 +17,12 @@ INSERT INTO movies (title, title_eng, year_movie, count_min, storyline) VALUES
 ('Назад в будущее', 'Back to the Future', 1985, 116, 'Подросток Марти с помощью машины времени, сооружённой его другом-профессором доком Брауном, попадает из 80-х в далекие 50-е. Там он встречается со своими будущими родителями, ещё подростками, и другом-профессором, совсем молодым.'),
 ('Криминальное чтиво', 'Pulp Fiction', 1994, 154, NULL);
 
+DROP TABLE IF EXISTS cinema;
 RENAME TABLE movies TO cinema;
 
 ALTER TABLE cinema 
 ADD COLUMN status_active BIT DEFAULT b'1',
-ADD COLUMN genre_id INT UNSIGNED AFTER title_eng; 
+ADD COLUMN genre_id BIGINT UNSIGNED AFTER title_eng; 
 
 ALTER TABLE cinema 
 DROP COLUMN status_active;
@@ -40,3 +41,30 @@ CREATE TABLE genres (
 );
 
 DROP TABLE actors;
+
+ALTER TABLE cinema 
+ADD FOREIGN KEY (genre_id) REFERENCES genres(id) ON UPDATE CASCADE ON DELETE SET NULL; 
+
+INSERT INTO genres (name)
+VALUES 
+('Triller'), 
+('Story'),
+('Comedy');
+
+SELECT id, title,
+CASE id
+	WHEN 1 THEN 'Подростковый'
+	WHEN 4 THEN 'Детский'
+	WHEN 5 THEN 'Взрослый'
+	ELSE 'Не указано'
+END AS 'Category'
+FROM cinema; 
+
+SELECT 
+	id AS 'Номер фильма',
+	title AS 'Название фильма',
+	IF (count_min < 50, 'Короткометражный',
+		IF (count_min BETWEEN 50 AND 100, 'Среднеметражный', 
+			IF (count_min > 100, 'Полнометражный', 'Не определено'))) AS 'тип'
+FROM cinema;
+		
