@@ -50,14 +50,16 @@ JOIN  -- делаю таблицу, где известен id лучшего и
 			m.from_user_id AS best_sender_id,
 			COUNT(m.id) AS counter
 		FROM messages m
-		WHERE m.from_user_id IN -- вибираем длузей пользователя
+		WHERE m.from_user_id IN -- вибираем друзей пользователя
 						(SELECT target_user_id AS friends_id 
 						FROM friend_requests 
-						WHERE initiator_user_id = 5 AND status = 'approved'
+						WHERE initiator_user_id = 5 -- вводим id пользователя вручную
+						AND status = 'approved'
 						UNION
 						SELECT initiator_user_id AS friends_id 
 						FROM friend_requests 
-						WHERE target_user_id = 5 AND status = 'approved')
+						WHERE target_user_id = 5 -- и тут вводим
+						AND status = 'approved')
 		GROUP BY best_sender_id 
 		ORDER BY counter DESC
 		LIMIT 1) AS bs
